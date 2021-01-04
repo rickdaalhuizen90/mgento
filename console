@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+
+$app = new Application();
+
+$rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('src/Command'));
+$regex = new RegexIterator($rii, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+
+foreach ($regex as $file) {
+    $file = current($file);
+    $class = 'App\Command\\' . str_replace('/', '\\', str_replace(['src/Command/', '.php'], '', $file));
+    $app->add(new $class());
+}
+
+$app->run();
